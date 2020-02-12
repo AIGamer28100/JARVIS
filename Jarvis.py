@@ -5,11 +5,10 @@ import time
 from gtts import gTTS
 from subprocess import call
 import cv2, sys, numpy, os, time
-import chatterbot
-from chatterbot import *
 
-HOT_KEY_WORD='jarvis'
- 
+password = '0123456789-='
+
+#Function to Read out The DATA
 def speak(data):
     print("Speaking")
     tts = gTTS(text=data , lang='en',slow=False)
@@ -17,16 +16,14 @@ def speak(data):
     os.system("mpg321 audio.mp3")
     print(data)
     
-
+#Funtion to Listen the Input Audio
 def listening(t):
     try:
-        #print('.',end="")
         with sr.Microphone() as source:
-            #r.adjust_for_ambient_noise(source)
+            r.adjust_for_ambient_noise(source)
             audio = r.listen(source)
             data=r.recognize_google(audio,language = "en",show_all=True)
     except (sr.UnknownValueError,LookupError):
-        #speak('UnknownValueError or LookupError Occurred !!!')
         return listening(t)
     except sr.RequestError as e:
         speak('Network Error.')
@@ -34,20 +31,16 @@ def listening(t):
     print(data)
     return data
 
+
+#Funtion To Process Input And Do Actions and Give out Respected Outputs
 def jarvis():
     try:
         print("Listening")
         t=time.time()
         data = listening(t)
-        print("")
-        print("Jarvis")
-        if data==0:
-            sdata = ""
-        elif data == 'repeat':
-            speak(sdata)
         else:
             if 'exit' in data or 'quit' in data or 'logout' in data:            
-                return 'blah blah'
+                return 'exit'
             elif 'music' in data:
                 speak('Opening Wynk Music .')
                 os.system("google-chrome --new-window https://wynk.in")
@@ -76,7 +69,7 @@ def jarvis():
                 data=listening(t)
                 if 'yes' in data or 'ya' in data or 'ofcourse' in data or 'definitely' in data:
                     speak('Shutting Down System.')
-                    call('echo {} | sudo -S {}'.format('1234567890-=','poweroff'),shell=True)
+                    call('echo {} | sudo -S {}'.format(password,'poweroff'),shell=True)
                 elif 'no' in data or 'not' in data or 'na' in data or 'cancel' in data:
                     speak('ok done!')
                 else:
@@ -89,20 +82,16 @@ def jarvis():
         speak('Key board Interrupted !!')
         speak('Exiting...')
         exit()   
+
 r=sr.Recognizer()
 r.pause_threshold = 0.5
 r.energy_threshold = 4000
 r.dynamic_energy_threshold = True
-#name=face()
-#print(name)
-#cv2.destroyWindow("..Facial Recogonision..")
+
 try:
-    #time.sleep(120)
-    #speak("Welcome Back. How may i help you !")
-    #speak('ya')
     while True:
         re = jarvis()
-        if re == 'blah blah':
+        if re == 'exit':
             speak('Exiting...')
             exit()
 except KeyboardInterrupt:
